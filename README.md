@@ -7,11 +7,17 @@
 
 # Features:
 • Add new books to the library 
+
 • View all books in the system
+
 • Borrow books
+
 • Return books
+
 • Automatic overdue penalty calculation
+
 • Data persistence using text files
+
 • Console-based user interaction
 
 # Technologies Used:
@@ -52,8 +58,12 @@ Python Basics, John Smith, 12345, True
 
 # Future Improvements
 • Add multiple user accounts
+
 • Implement book search by author or ISBN
+
 • Add due date reminders
+
 • Create a graphical user interface (GUI)
+
 • Implement a database instead of text files
 
