@@ -1,0 +1,10 @@
+Python Basics,John Smith,9780135166307,True
+Data Structures in Python,Michael Brown,9781492051367,True
+Introduction to Algorithms,Thomas H. Cormen,9780262033848,True
+Clean Code,Robert C. Martin,9780132350884,True
+Artificial Intelligence Basics,Tom Taulli,9781484250270,True
+Database System Concepts,Abraham Silberschatz,9780073523323,True
+Computer Networks,Andrew S. Tanenbaum,9780132126953,True
+Operating System Concepts,Abraham Silberschatz,9781118063330,True
+Machine Learning Fundamentals,Jason Bell,9781484235635,True
+Software Engineering Principles,Roger S. Pressman,9780078022128,True
