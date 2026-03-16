@@ -41,7 +41,7 @@ class Book:
         return "Available" if self.available else "Borrowed"
     
     def get_penalty(self):
-        return self.calcualte_penalty() if not self.available else 0
+        return self.calculate_penalty() if not self.available else 0
 
 # ------------------------------
 # Library Class
@@ -59,18 +59,18 @@ class Library:
         return None
 
     def save_books(self):
-        with open("books.txt", "w") as file:
+        with open("books.txt", "w", encoding = "utf-8") as file:
             for book in self.books:
+                borrower_id = book.borrower_id if book.borrower_id else ""
                 borrow_date = book.borrow_date.strftime("%Y-%m-%d %H:%M:%S") if book.borrow_date else ""
                 due_date = book.due_date.strftime("%Y-%m-%d %H:%M:%S") if book.due_date else ""
-                borrower_id = book.borrower_id if book.borrower_id else ""
                 file.write(f"{book.title},{book.author},{book.isbn},{book.available},{borrower_id},{borrow_date},{due_date}\n")
 
 
     def load_books(self):
         books = []
         try:
-            with open("books.txt", "r") as file:
+            with open("books.txt", "r", encoding = "utf-8") as file:
                 for line in file:
                     parts = line.strip().split(",")
                     if len(parts) == 7:
@@ -83,7 +83,7 @@ class Library:
                             book.borrow_date = datetime.strptime(borrow_date.strip(), "%Y-%m-%d %H:%M:%S")
                         
                         if due_date:
-                            book.due_date = datetime.strptime(due_date.strip(), "Y-%m-%d %H:%M:%S")
+                            book.due_date = datetime.strptime(due_date.strip(), "%Y-%m-%d %H:%M:%S")
 
                         books.append(book)
         except FileNotFoundError:
@@ -108,6 +108,7 @@ def clear_fields():
     author_entry.delete(0, tk.END)
     isbn_entry.delete(0, tk.END)
     person_entry.delete(0, tk.END)
+    history_list.delete(0, tk.END)
     update_status("Fields cleared.")
 
 
@@ -139,7 +140,9 @@ def view_books(filtered_books = None):
         book_table.delete(row)
     
     books_to_show = filtered_books if filtered_books is not None else library.books
-     
+    
+    print("Books to show:", len(books_to_show))   # debug line
+
     for book in books_to_show:
         due = book.due_date.strftime("%Y-%m-%d") if book.due_date else "-"
         penalty_value = book.get_penalty()
@@ -188,7 +191,7 @@ def search_books():
             filtered.append(book)
         elif category == "ISBN" and keyword in book.isbn.lower():
             filtered.append(book)
-        elif category == "Borrowed ID":
+        elif category == "Borrower ID":
             borrower = book.borrower_id.lower() if book.borrower_id else ""
             if keyword in borrower:
                 filtered.append(book)
@@ -202,6 +205,44 @@ def reset_search():
     view_books()
     update_status("Search reset.")
 
+def check_person_history():
+    person_id = person_entry.get().strip()
+
+    if not person_id:
+        messagebox.showerror("Error","Please enter a Person ID.")
+        update_status("Missing Person ID.")
+        return
+    
+    if not valid_person_id(person_id):
+        messagebox.showerror("Invalid ID","Person ID must be exactly 6 digits.")
+        update_status("Invalid Person ID.")
+        return
+    
+    history_list.delete(0, tk.END)
+
+    found_books = []
+
+    for book in library.books:
+        if book.borrower_id == person_id:
+            borrow_date = book.borrow_date.strftime("%Y-%m-%d %H:%M:%S") if book.borrow_date else "-"
+            due_date = book.due_date.strftime("%Y-%m-%d") if book.due_date else "-"
+            penalty = f"${book.get_penalty()}"
+
+            record = f"{book.title} | {book.author} | {book.isbn} | Borrowed: {borrow_date} | Due: {due_date} | Penalty: {penalty}"
+            found_books.append(record)
+
+    if found_books:
+        for item in found_books:
+            history_list.insert(tk.END, item)
+
+        messagebox.showinfo("Result", f"Found {len(found_books)} borrowed book(s).")
+        update_status(f"Found {len(found_books)} borrowed book(s) for Person ID {person_id}.")
+    else:
+        history_list.insert(tk.END, "No currently borrowed books found for this Person ID.")
+
+        messagebox.showinfo("Result", "No borrowed books found for this Person ID.")
+        update_status("No borrowed books found for this Person ID.")
+
 
 def borrow_book():
     title = title_entry.get().strip()
@@ -214,6 +255,7 @@ def borrow_book():
     
     if not person_id:
         messagebox.showerror("Error", "Please enter a Person ID.")
+        update_status("Missing Person ID.")
         return
     
     if not valid_person_id(person_id):
@@ -276,6 +318,8 @@ def on_row_select(event):
             title_entry.insert(0, values[0])
             author_entry.insert(0, values[1])
             isbn_entry.insert(0, values[2])
+            if values[3] != "-":
+                person_entry.insert(0, values[3])
             update_status(f'Selected book: "{values[0]}"')
 
 
@@ -284,13 +328,14 @@ def clear_entries_only():
     author_entry.delete(0, tk.END)
     isbn_entry.delete(0, tk.END)
     person_entry.delete(0, tk.END)
+    history_list.delete(0, tk.END)
 
 
 # ------------------------------
 # Main Window
 root = tk.Tk()
 root.title("Library Management System")
-root.geometry("1000x600")
+root.geometry("1100x720")
 root.configure(bg = "#F5F7FA")
 root.resizable(False, False)
 
@@ -327,7 +372,11 @@ style.configure("TButton",
 
 style.configure("Treeview",
                 font = ("Segoe UI", 10),
-                rowheight = 28)
+                rowheight = 28,
+                foreground = "black",
+                background = "white",
+                fieldbackground = "white"
+                )
 
 style.configure("Treeview.Heading",
                 font = ("Segoe UI", 10, "bold"))
@@ -380,16 +429,17 @@ ttk.Button(action_frame, text = "Add Book", width = 18, command = add_book).grid
 ttk.Button(action_frame, text = "View Books", width = 18, command = view_books).grid(row = 1, column = 0, padx = 10, pady = 8)
 ttk.Button(action_frame, text = "Borrow Book", width = 18, command = borrow_book).grid(row = 2, column = 0, padx = 10, pady = 8)
 ttk.Button(action_frame, text = "Return Book", width = 18, command = return_book).grid(row = 3, column = 0, padx = 10, pady = 8)
-ttk.Button(action_frame, text = "Clear Fields", width = 18, command = clear_fields).grid(row = 4, column = 0, padx = 10, pady = 8)
-ttk.Button(action_frame, text = "Save & Exit", width = 18, command = save_and_exit).grid(row = 5, column = 0, padx = 10, pady = 8)
+ttk.Button(action_frame, text = "Check Person ID", width = 18, command = check_person_history).grid(row = 4, column = 0, padx = 10, pady = 8)
+ttk.Button(action_frame, text = "Clear Fields", width = 18, command = clear_fields).grid(row = 5, column = 0, padx = 10, pady = 8)
+ttk.Button(action_frame, text = "Save & Exit", width = 18, command = save_and_exit).grid(row = 6, column = 0, padx = 10, pady = 8)
 
 # ------------------------------
 # Bottom Section - Table
 table_frame = ttk.LabelFrame(root, text = "Library Records", style = "Custom.TLabelframe")
-table_frame.pack(fill = "both", expand = True, padx = 20, pady = (5, 15))
+table_frame.pack(fill = "both", expand = True, padx = 20, pady = (5, 10))
 
 search_frame = tk.Frame(root, bg = "#F5F7FA")
-search_frame.pack(fill = "x", padx = 20, pady = (5, 10))
+search_frame.pack(fill = "x", padx = 20, pady = (5, 15))
 
 ttk.Label(search_frame, text = "Search:").pack(side = "left", padx = (0, 8))
 
@@ -428,6 +478,26 @@ book_table.pack(side = "left", fill = "both", expand = True, padx = (10, 0), pad
 scrollbar.pack(side = "right", fill = "y", padx = (0, 10), pady = 10)
 
 book_table.bind("<<TreeviewSelect>>", on_row_select)
+
+# ------------------------------
+# Person ID Borrow History Section
+history_frame = ttk.LabelFrame(root, text = "Person ID Borrowed Books", style = "Custom.TLabelframe")
+history_frame.pack(fill = "both", expand = False, padx = 20, pady = (0, 10))
+
+history_scrollbar = ttk.Scrollbar(history_frame, orient = "vertical")
+history_scrollbar.pack(side = "right" , fill = "y", padx = (0, 10), pady = 10)
+
+history_list = tk.Listbox(
+    history_frame,
+    height = 6,
+    width = 120,
+    yscrollcommand= history_scrollbar.set,
+    font = ("Segoe UI", 10)
+)
+history_list.pack(side = "left", fill = "both", expand = True, padx = (10, 0), pady = 10)
+
+history_scrollbar.config(command = history_list.yview)
+
 
 # ------------------------------
 # Status Bar
