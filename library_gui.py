@@ -19,7 +19,7 @@ class Book:
             self.available = False
             self.borrower_id = person_id
             self.borrow_date = datetime.now()
-            self.due_date = self.borrow_date + timedelta(days = 14)
+            self.due_date = self.borrow_date + timedelta(days = 1)
             return True
         return False
 
@@ -386,7 +386,7 @@ style.configure("Treeview.Heading",
 header_frame = tk.Frame(root, bg = "#F5F7FA")
 header_frame.pack(fill = "x", padx = 20, pady = (20, 10))
 
-title_label = ttk.Label(header_frame, text="Library Management System", style="Title.TLabel")
+title_label = ttk.Label(header_frame, text = "Library Management System", style = "Title.TLabel")
 title_label.pack()
 
 subtitle_label = ttk.Label(
@@ -472,7 +472,7 @@ book_table.column("Due Date", width = 120, anchor = "center", stretch = True)
 book_table.column("Penalty", width = 90, anchor = "center", stretch = True)
 
 scrollbar = ttk.Scrollbar(table_frame, orient = "vertical", command = book_table.yview)
-book_table.configure(yscrollcommand=scrollbar.set)
+book_table.configure(yscrollcommand = scrollbar.set)
 
 book_table.pack(side = "left", fill = "both", expand = True, padx = (10, 0), pady = 10)
 scrollbar.pack(side = "right", fill = "y", padx = (0, 10), pady = 10)

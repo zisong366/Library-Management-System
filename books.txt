@@ -1,5 +1,11 @@
-The Three Musketeers,Alexandre Dumas,9787531728191,False,654321,2026-03-15 23:46:17,2026-03-29 23:46:17
-Python Basics,John Smith,9780135166307,False,123456,2026-03-15 23:46:04,2026-03-29 23:46:04
-Operating System Concepts,Abraham Silberschatz,9781118063330,False,987654,2026-03-15 23:49:57,2026-03-29 23:49:57
+The Three Musketeers,Alexandre Dumas,9787531728191,True,,,
+Python Basics,John Smith,9780135166307,True,,,
+Operating System Concepts,Abraham Silberschatz,9781118063330,True,,,
 Data Structures in Python,Michael Brown,9781492051367,True,,,
 Artificial Intelligence Basics,Tom Taulli,9781484250270,True,,,
+Database System Concepts,Abraham Silberschatz,9780073523323,True,,,
+Computer Networks,Andrew S. Tanenbaum,9780132126953,True,,,
+Machine Learning Fundamentals,Jason Bell,9781484355635,True,,,
+Software Engineering Principles,Roger S. Pressman,9780078022128,True,,,
+Introduction to Algorithms,Thomas H. Cormen,9780262033848,True,,,
+Clean Code,Robert C. Martin,9780132350884,True,,,
